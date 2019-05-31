@@ -4,25 +4,29 @@ services:
     image: mysql
     command: mysqld --default-authentication-plugin=mysql_native_password
     environment:
-      - MYSQL_ROOT_PASSWORD=veryhardpassword
-      - MYSQL_DATABASE=easyapp
-      - MYSQL_USER=easyapp
-      - MYSQL_PASSWORD=veryhardpassword
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+      - MYSQL_DATABASE=${DB_NAME}
+      - MYSQL_USER=${DB_USERNAME}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - easy-appointments-data:/var/lib/mysql
+    restart: always
+
 
   application:
     image: easyappointments
     build:
       context: .
-    volumes:
-      - ./src:/var/www/html
-    command: dev
     ports:
-      - ${APP_HOST}:80:80
+      - 2376:80
     environment:
       - DB_HOST=database:3306
-      - APP_URL=localhost
-    depends_on:
-      - database
     env_file:
       - .env
+    volumes:
+      - easy-appointments-storage:/var/www/html/src/storage
     restart: always
+
+volumes:
+  easy-appointments-data:
+  easy-appointments-storage:
